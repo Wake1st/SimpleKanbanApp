@@ -2,18 +2,20 @@ import { type PropsWithChildren } from "react";
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 
-export type DraggableItem = PropsWithChildren<{
+export type DraggableItem = {
   title: string,
   index: number,
   parent: string,
-}>;
+};
+
+type DraggableProps = PropsWithChildren<DraggableItem>;
 
 const Draggable = ({ 
   title, 
   index, 
   parent,
   children,
-}: DraggableItem) => {
+}: DraggableProps) => {
   const {
     attributes,
     listeners,
@@ -34,7 +36,7 @@ const Draggable = ({
 
   return (
     <div
-      className={style.transform}
+      style={style}
       {...listeners}
       {...attributes}
       ref={setNodeRef}

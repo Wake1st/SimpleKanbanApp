@@ -5,7 +5,13 @@ import { type DragEndEvent } from "@dnd-kit/core";
 import Droppable from "../Droppable";
 import AddItem from "./AddItem";
 import { type Item } from "../types";
+import { type DraggableItem } from "../Draggable";
 
+export const AREAS = {
+  TODO: 'todo',
+  INPROGRESS: 'inprogress',
+  DONE: 'done',
+};
 
 const Board = () => {
   const [todoItems, setToDoItems] = useState<Item[]>([]);
@@ -21,54 +27,70 @@ const Board = () => {
       collisionDetection={rectIntersection}
       onDragEnd={(e: DragEndEvent) => {
         const container = e.over?.id;
-        const title = e.active.data.current?.title as string ?? "";
-        const index = e.active.data.current?.index as number ?? 0;
-        const parent = e.active.data.current?.parent as string ?? "ToDo";
-        const item = { title };
 
-        switch (container) {
-          case "Done":
-            setDoneItems([...doneItems, item]);
-            break;
-          case "InProgress":
-            setInProgressItems([...inProgressItems, item]);
-            break;
-          case "ToDo":
-          default:
-            setToDoItems([...todoItems, item]);
+        if (!e.active.data.current) {
+          return; 
+        }
+
+        const { 
+          title, 
+          index, 
+          parent 
+        } = (e.active.data.current ?? { 
+          title: "", 
+          index: 0, 
+          parent: AREAS.TODO
+        }) as DraggableItem;
+
+        // const title = e.active.data.current?.title as string ?? "";
+        // const index = e.active.data.current?.index as number ?? 0;
+        // const parent = e.active.data.current?.parent as string ?? AREAS.TODO;
+        const item = { title };
+        
+        if (parent === container) {
+          return; //  item has not moved
         }
 
         switch (parent) {
-          case "Done":
-            setDoneItems([
-              ...doneItems.slice(0, index), 
-              ...doneItems.slice(index + 1),
+          case AREAS.TODO:
+            setToDoItems([
+              ...todoItems.slice(0, index), 
+              ...todoItems.slice(index + 1), 
             ]);
             break;
-          case "InProgress":
+          case AREAS.INPROGRESS:
             setInProgressItems([
               ...inProgressItems.slice(0, index), 
               ...inProgressItems.slice(index + 1),
             ]);
             break;
-          case "ToDo":
-          default:
-            setToDoItems([
-              ...todoItems.slice(0, index), 
-              ...todoItems.slice(index + 1), 
+          case AREAS.DONE:
+            setDoneItems([
+              ...doneItems.slice(0, index), 
+              ...doneItems.slice(index + 1),
             ]);
+        }
+
+        switch (container) {
+          case AREAS.TODO:
+            setToDoItems([...todoItems, item]);
+            break;
+          case AREAS.INPROGRESS:
+            setInProgressItems([...inProgressItems, item]);
+            break;
+          case AREAS.DONE:
+            setDoneItems([...doneItems, item]);
         }
       }}
     >
-      <div className="flex">
+      <div className="w-full flex flex-col bg-sky-900 p-4 space-y-4 rounded-xl">
         <AddItem addItem={addNewItem} />
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
-          <Droppable title="ToDo" items={todoItems} />
-          <Droppable title="In Progress" items={inProgressItems} />
-          <Droppable title="Done" items={doneItems} />
+        <div className="h-96 columns-3 gap-4">
+          <Droppable id={AREAS.TODO} title="ToDo" items={todoItems} />
+          <Droppable id={AREAS.INPROGRESS} title="In Progress" items={inProgressItems} />
+          <Droppable id={AREAS.DONE} title="Done" items={doneItems} />
         </div>
       </div>
-      
     </DndContext>
   )
 }

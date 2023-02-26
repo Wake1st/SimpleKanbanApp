@@ -6,11 +6,11 @@ type CardProps = {
 const Card = ({ title, text }: CardProps) => {
   return (
     <div
-      className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 text-white hover:bg-white/20"
+      className="flex flex-col gap-2 p-2 px-4 rounded-sm bg-white/10 text-slate-200 hover:bg-white/20"
     >
-    <h3 className="text-2xl font-bold">{title}</h3>
-    <div className="text-lg">{text}</div>
-  </div>
+      <h3 className="text-xl font-bold">{title}</h3>
+      <div className="text-md">{text}</div>
+    </div>
   )
 };
 
